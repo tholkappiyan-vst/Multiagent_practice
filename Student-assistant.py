@@ -1,15 +1,7 @@
-# -*- coding: utf-8 -*-
 
-# ============================================================
-# 1. INSTALL REQUIRED PACKAGE
-# ============================================================
 
 !pip install -U langchain-google-genai
 
-
-# ============================================================
-# 2. IMPORTS
-# ============================================================
 
 import os
 import sqlite3
@@ -21,26 +13,18 @@ from langchain.agents import create_agent
 from langchain_core.tools import tool
 
 
-# ============================================================
-# 3. GOOGLE API KEY
-# ============================================================
-
-os.environ["GOOGLE_API_KEY"] = "YOUR_API_KEY"
 
 
-# ============================================================
-# 4. CREATE GEMINI MODEL
-# ============================================================
+os.environ["GOOGLE_API_KEY"] = "API_KEY"
+
+
+
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-3.5-flash-lite",
     temperature=0
 )
 
-
-# ============================================================
-# 5. CREATE SQLITE DATABASE
-# ============================================================
 
 database_path = "students.db"
 
@@ -64,11 +48,7 @@ CREATE TABLE IF NOT EXISTS students (
 db_connection.commit()
 
 
-# ============================================================
-# 6. INSERT STUDENT DATA
-# ============================================================
 
-# Clear old data
 db_cursor.execute("DELETE FROM students")
 
 
@@ -93,9 +73,6 @@ db_connection.close()
 print("Student database created successfully!")
 
 
-# ============================================================
-# 7. TOOL 1 - GET STUDENT INFORMATION
-# ============================================================
 
 @tool
 def get_student_info(student_id: str) -> str:
@@ -133,9 +110,7 @@ def get_student_info(student_id: str) -> str:
     )
 
 
-# ============================================================
-# 8. TOOL 2 - GET STUDENT MARKS
-# ============================================================
+
 
 @tool
 def get_student_marks(student_id: str) -> str:
@@ -177,9 +152,7 @@ def get_student_marks(student_id: str) -> str:
     )
 
 
-# ============================================================
-# 9. SAFE CALCULATOR
-# ============================================================
+
 
 SUPPORTED_OPERATORS = {
     ast.Add: op.add,
@@ -196,7 +169,6 @@ def evaluate_math_node(node):
     Safely evaluate a mathematical expression.
     """
 
-    # Number
     if isinstance(node, ast.Constant):
 
         if isinstance(node.value, (int, float)):
@@ -205,7 +177,7 @@ def evaluate_math_node(node):
         raise ValueError("Invalid number")
 
 
-    # Binary operation
+
     if isinstance(node, ast.BinOp):
 
         operation = SUPPORTED_OPERATORS.get(type(node.op))
@@ -219,7 +191,7 @@ def evaluate_math_node(node):
         return operation(left_value, right_value)
 
 
-    # Unary operation
+    
     if isinstance(node, ast.UnaryOp):
 
         operation = SUPPORTED_OPERATORS.get(type(node.op))
@@ -249,11 +221,6 @@ def safe_calculate(math_expression):
         parsed_expression.body
     )
 
-
-# ============================================================
-# 10. TOOL 3 - CALCULATOR
-# ============================================================
-
 @tool
 def calculator(expression: str) -> str:
     """
@@ -280,9 +247,6 @@ def calculator(expression: str) -> str:
         )
 
 
-# ============================================================
-# 11. TOOL 4 - GET PASSING RULES
-# ============================================================
 
 @tool
 def get_passing_rules() -> str:
@@ -306,9 +270,7 @@ def get_passing_rules() -> str:
     )
 
 
-# ============================================================
-# 12. ADD ALL TOOLS
-# ============================================================
+
 
 agent_tools = [
     get_student_info,
@@ -318,9 +280,7 @@ agent_tools = [
 ]
 
 
-# ============================================================
-# 13. CREATE LANGCHAIN AGENT
-# ============================================================
+
 
 student_agent = create_agent(
     model=llm,
@@ -377,18 +337,14 @@ IMPORTANT RULES:
 )
 
 
-# ============================================================
-# 14. GET USER QUESTION
-# ============================================================
+
 
 user_question = input(
     "Ask something about a student: "
 )
 
 
-# ============================================================
-# 15. INVOKE AGENT
-# ============================================================
+
 
 agent_result = student_agent.invoke(
     {
@@ -402,9 +358,6 @@ agent_result = student_agent.invoke(
 )
 
 
-# ============================================================
-# 16. GET FINAL ANSWER
-# ============================================================
 
 final_answer = agent_result["messages"][-1].content
 
@@ -419,9 +372,7 @@ if isinstance(final_answer, list):
     )
 
 
-# ============================================================
-# 17. DISPLAY RESULT
-# ============================================================
+
 
 print("\n" + "=" * 60)
 
